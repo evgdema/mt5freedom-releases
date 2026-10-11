@@ -14,7 +14,7 @@ Linux. Код — в отдельном закрытом репозитории.
 | Windows 10/11 | `MT5Freedom_X.Y.Z_x64-setup.exe` |
 | Linux-сервер (VPS) | `mt5freedom-linux-vps.sh` (сам скачает `mt5freedom-agent-x86_64-unknown-linux-gnu` и `MT5Freedom.ex5`) |
 
-Какой у Mac процессор: меню  → «Об этом Mac», строка «Чип» (Apple M…) или «Процессор» (Intel).
+Какой у Mac процессор: меню Apple → «Об этом Mac», строка «Чип» (Apple M…) или «Процессор» (Intel).
 
 Файлы `.app.tar.gz`, `.sig` и `latest.json` нужны обновлятору, скачивать их не надо.
 
@@ -35,7 +35,7 @@ MT5Freedom.
 2. Запустите MT5Freedom из «Программ». macOS покажет окно «Не удалось открыть «MT5Freedom»» («“MT5Freedom” Not
    Opened») с двумя кнопками. **Синяя кнопка по умолчанию — «Переместить в Корзину» (Move to Trash): не нажимайте
    Enter.** Нажмите мышью «Готово» (Done).
-3. Откройте меню  → «Системные настройки» → «Конфиденциальность и безопасность» (Privacy & Security) и прокрутите
+3. Откройте меню Apple → «Системные настройки» → «Конфиденциальность и безопасность» (Privacy & Security) и прокрутите
    вниз до раздела «Безопасность» (Security). Там строка «Программа «MT5Freedom» заблокирована для защиты Mac»
    («“MT5Freedom” was blocked to protect your Mac») — нажмите рядом «Открыть всё равно» (Open Anyway).
 4. Сразу появится второе окно «Открыть «MT5Freedom»?» («Open “MT5Freedom”?») с тремя кнопками. Синяя здесь тоже
@@ -120,8 +120,9 @@ Agent и MT5 запускаются при входе пользователя �
 
 1. Установите Tailscale на VPS и на компьютер с пультом ([tailscale.com/download](https://tailscale.com/download)),
    войдите в одну сеть. Адрес VPS — `tailscale ip -4` (вида `100.x.y.z`).
-2. Поставьте Wine (скрипт MetaQuotes `mt5linux.sh` с mql5.com ставит Wine и MT5 в префикс `~/.mt5`; можно и
-   `winehq-stable` с [winehq.org](https://wiki.winehq.org/Ubuntu)).
+2. Поставьте Wine: скрипт MetaQuotes `mt5linux.sh` с mql5.com ставит Wine и MT5 в префикс `~/.mt5`; можно и самим —
+   пакет `winehq-staging` с [winehq.org](https://wiki.winehq.org/Ubuntu), как в `mt5linux.sh`. Не `winehq-stable`:
+   установщик MT5 под Wine 11.0 stable падает с «A debugger has been found running in your system».
 3. Запустите скрипт тем пользователем, под которым будет работать MT5 (по SSH, root тоже подходит):
    ```sh
    curl -fsSLO https://github.com/evgdema/mt5freedom-releases/releases/latest/download/mt5freedom-linux-vps.sh
@@ -130,7 +131,13 @@ Agent и MT5 запускаются при входе пользователя �
    Он ставит Agent и советник в `~/.local/lib/mt5freedom`, виртуальный экран (Xvfb `:99`) и Agent в автозапуск systemd
    (работают после перезагрузки без входа в систему), открывает API Agent для Tailscale и с `--firewall` включает ufw:
    снаружи остаётся только SSH, порт 9200 — только через Tailscale.
-4. Если MT5 ещё не установлен: `DISPLAY=:99 WINEPREFIX=~/.mt5 wine mt5setup.exe`. Чтобы увидеть экран сервера,
+4. Если MT5 ещё не установлен: скачайте установщик MetaQuotes (или установщик своего брокера) и запустите его на
+   виртуальном экране:
+   ```sh
+   curl -fsSLO https://download.mql5.com/cdn/web/metaquotes.software.corp/mt5/mt5setup.exe
+   DISPLAY=:99 WINEPREFIX=~/.mt5 wine mt5setup.exe
+   ```
+   Чтобы увидеть экран сервера,
    запустите на VPS `bash mt5freedom-linux-vps.sh vnc`, а на своём компьютере `ssh -L 5900:127.0.0.1:5900 <пользователь>@<VPS>`
    и VNC-клиент на `localhost:5900` (на Mac — `open vnc://localhost:5900`). В MT5 войдите в счёт и добавьте
    `127.0.0.1` в «Сервис → Настройки → Советники → Разрешить WebRequest для следующих URL», затем закройте MT5.
